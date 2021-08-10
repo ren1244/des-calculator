@@ -200,7 +200,6 @@ function enc(msg, key, dest) {
 }
 
 function dec(cipher, key, dest) {
-    log = [];
     //key expension
     key = new DesKey(key);
     let keys = [];
