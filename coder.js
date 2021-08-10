@@ -1,3 +1,8 @@
+/**
+ * Coder 物件
+ * 處理 字串 <==> Uint8Array 的轉換
+ */
+
 let Coder = {}
 Coder.Utf8 = {
     enc(str) {

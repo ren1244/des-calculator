@@ -15,12 +15,12 @@ function splitKeys(key) {
  * @param {Uint8Array} key 8、16、24 byte 金鑰
  * @returns {Uint8Array} 加密後的 8 byte 資料
  */
-function enc(msg, key) {
+function cipher(msg, key) {
     let keys = splitKeys(key);
     let idx = 0;
-    let data = Des.enc(msg, keys[(idx++) % keys.length]);
-    Des.dec(data, keys[(idx++) % keys.length], data);
-    Des.enc(data, keys[(idx++) % keys.length], data);
+    let data = Des.cipher(msg, keys[(idx++) % keys.length]);
+    Des.decipher(data, keys[(idx++) % keys.length], data);
+    Des.cipher(data, keys[(idx++) % keys.length], data);
     return data;
 }
 
@@ -31,16 +31,16 @@ function enc(msg, key) {
  * @param {Uint8Array} key 8、16、24 byte 金鑰
  * @param {Uint8Array} 解密後的 8 byte 資料
  */
-function dec(cipher, key) {
+function decipher(cipher, key) {
     let keys = splitKeys(key);
     if (keys.length > 2) {
         keys.reverse();
     }
     let idx = 0;
-    let data = Des.dec(cipher, keys[(idx++) % keys.length]);
-    Des.enc(data, keys[(idx++) % keys.length], data);
-    Des.dec(data, keys[(idx++) % keys.length], data);
+    let data = Des.decipher(cipher, keys[(idx++) % keys.length]);
+    Des.cipher(data, keys[(idx++) % keys.length], data);
+    Des.decipher(data, keys[(idx++) % keys.length], data);
     return data;
 }
 
-export { enc, dec };
+export { cipher, decipher };

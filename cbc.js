@@ -1,8 +1,13 @@
+/**
+ * CBC 塊鏈結模式物件
+ * 一開始設定好「加密演算法」、「填充演算法」、「區塊大小」後
+ * 即可用 encrypt 與 decrypt 加密或解密訊息
+ */
+
 function CBC(config) {
     const param = {
-        encFunc: 'encrypt',
-        decFunc: 'decrypt',
-        padFunc: 'padding',
+        cipherAlg: 'cipherAlg',
+        paddingAlg: 'paddingAlg',
         sz: 'blockSize'
     };
     for (let k in param) {
@@ -26,11 +31,13 @@ CBC.prototype.mergeData=function(arr) {
     }
     return result;
 }
-
-CBC.prototype.enc = function (msg, key, iv) {
-    let paddedMsg = this.padFunc(msg);
-    let lastBlock = iv;
+import {Coder} from './coder.js';
+CBC.prototype.encrypt = function (msg, key, iv) {
     let sz = this.sz;
+    console.log(Coder.Hex.dec(msg));
+    let paddedMsg = this.paddingAlg.pad(msg, sz);
+    console.log(Coder.Hex.dec(paddedMsg));
+    let lastBlock = iv;
     let n = paddedMsg.length;
     let ouputBlocks=[];
     for (let i = 0; i + sz < n + 1; i += sz) {
@@ -38,27 +45,27 @@ CBC.prototype.enc = function (msg, key, iv) {
         for (let j = 0; j < sz; ++j) {
             block[j] ^= lastBlock[j];
         }
-        lastBlock=this.encFunc(block, key);
+        lastBlock=this.cipherAlg.cipher(block, key);
         ouputBlocks.push(lastBlock);
     }
     return this.mergeData(ouputBlocks);
 }
 
-CBC.prototype.dec = function (cipher, key, iv) {
+CBC.prototype.decrypt = function (cipher, key, iv) {
     let lastBlock = iv;
     let sz = this.sz;
     let n = cipher.length;
     let ouputBlocks=[];
     for (let i = 0; i + sz < n + 1; i += sz) {
         let block = cipher.slice(i, i + sz);
-        let data = this.decFunc(block, key);
+        let data = this.cipherAlg.decipher(block, key);
         for (let j = 0; j < sz; ++j) {
             data[j] ^= lastBlock[j];
         }
         lastBlock=block;
         ouputBlocks.push(data);
     }
-    return this.mergeData(ouputBlocks);
+    return this.paddingAlg.unpad(this.mergeData(ouputBlocks));
 }
 
 export {CBC};

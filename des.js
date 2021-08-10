@@ -162,7 +162,7 @@ function computeF(R, K, O, T) {
     permutate(T, O, pTable);
 }
 
-function enc(msg, key, dest) {
+function cipher(msg, key, dest) {
     key = new DesKey(key);
     let buffers = [
         new Uint8Array(6),
@@ -199,7 +199,7 @@ function enc(msg, key, dest) {
     return dest;
 }
 
-function dec(cipher, key, dest) {
+function decipher(cipher, key, dest) {
     //key expension
     key = new DesKey(key);
     let keys = [];
@@ -241,6 +241,4 @@ function dec(cipher, key, dest) {
 
 }
 
-
-
-export { enc, dec };
+export { cipher, decipher };
