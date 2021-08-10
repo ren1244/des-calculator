@@ -101,6 +101,26 @@ function permutate(src, dest, map) {
     }
 }
 
+function permutateToLR(src, L, R, map) {
+    for (let i = 0; i < 32; ++i) {
+        let k = map[i] - 1;
+        let b = src[k >>> 3] >>> 7 - (k & 7) & 1;
+        L[i >>> 3] |= b << 7 - (i & 7);
+
+        k = initPermArr[32 + i] - 1;
+        b = src[k >>> 3] >>> 7 - (k & 7) & 1;
+        R[i >>> 3] |= b << 7 - (i & 7);
+    }
+}
+
+function permutateByLR(dest, L, R, map) {
+    for (let i = 0; i < 64; ++i) {
+        let k = map[i] - 1;
+        let b = k < 32 ? (L[k >>> 3] >>> 7 - (k & 7) & 1) : (R[k - 32 >>> 3] >>> 7 - (k - 32 & 7) & 1);
+        dest[i >>> 3] |= b << 7 - (i & 7);
+    }
+}
+
 function sbox(src, dest) {
     dest.fill(0);
     for (let i = 0; i < 8; ++i) {
@@ -129,7 +149,20 @@ function sbox(src, dest) {
     }
 }
 
-function des(msg, key, dest) {
+function computeF(R, K, O, T) {
+    // O = E(R)
+    permutate(R, O, eTable);
+    // O ^= K
+    for (let j = 0; j < 6; ++j) {
+        O[j] ^= K[j];
+    }
+    // T = sbox(O)
+    sbox(O, T);
+    // O = P(T)
+    permutate(T, O, pTable);
+}
+
+function enc(msg, key, dest) {
     key = new DesKey(key);
     let buffers = [
         new Uint8Array(6),
@@ -140,51 +173,75 @@ function des(msg, key, dest) {
     let L = buffers[0],
         R = buffers[1], O, T, K;
     //把 msg 轉換為 L0 跟 R0
-    for (let i = 0; i < 32; ++i) {
-        let k = initPermArr[i] - 1;
-        let b = msg[k >>> 3] >>> 7 - (k & 7) & 1;
-        L[i >>> 3] |= b << 7 - (i & 7);
-
-        k = initPermArr[32 + i] - 1;
-        b = msg[k >>> 3] >>> 7 - (k & 7) & 1;
-        R[i >>> 3] |= b << 7 - (i & 7);
-    }
+    permutateToLR(msg, L, R, initPermArr);
     //加密迴圈
     for (let i = 0; i < 16; ++i) {
         L = buffers[i & 3];
         R = buffers[i + 1 & 3];
         O = buffers[i + 2 & 3];
         T = buffers[i + 3 & 3];
-        // T = E(R)
-        permutate(R, T, eTable);
-        // T ^= K
-        K = key.getNext();
-        for (let j = 0; j < 6; ++j) {
-            T[j] ^= K[j];
-        }
-        // O = sbox(T)
-        sbox(T, O);
-        // T = P(O)
-        permutate(O, T, pTable);
-        //O = T XOR L
+        //T = f(R, K)
+        computeF(R, key.getNext(), O, T);
+        //O = O XOR L
         for (let j = 0; j < 4; ++j) {
-            O[j] = T[j] ^ L[j];
+            O[j] ^= L[j];
         }
     }
     L = buffers[16 & 3];
     R = buffers[17 & 3];
     //IP_inverse(R16L16)
-    if(!dest) {
-        dest=new Uint8Array(8);
+    if (!dest) {
+        dest = new Uint8Array(8);
     } else {
         dest.fill(0);
     }
-    for (let i = 0; i < 64; ++i) {
-        let k = initPermInvArr[i] - 1;
-        let b = k<32? (R[k >>> 3] >>> 7 - (k & 7) & 1) : (L[k-32 >>> 3] >>> 7 - (k-32 & 7) & 1);
-        dest[i >>> 3] |= b << 7 - (i & 7);
-    }
+    permutateByLR(dest, R, L, initPermInvArr);
     return dest;
 }
 
-export { des };
+function dec(cipher, key, dest) {
+    log = [];
+    //key expension
+    key = new DesKey(key);
+    let keys = [];
+    for (let i = 0; i < 16; ++i) {
+        keys.push(key.getNext().slice());
+    }
+    //
+    let buffers = [
+        new Uint8Array(6),
+        new Uint8Array(6),
+        new Uint8Array(6),
+        new Uint8Array(6)
+    ];
+    let L = buffers[0],
+        R = buffers[1], O, T, K;
+    //把 cipher 轉換為 L16 跟 R16
+    permutateToLR(cipher, R, L, initPermArr);
+    for (let i = 16; i > 0; --i) {
+        L = buffers[i & 3];
+        R = buffers[i + 1 & 3];
+        T = buffers[i + 2 & 3];
+        O = buffers[i + 3 & 3];
+        //算出 f(R{n-1}) 值，注意 L{n}=R{n-1}
+        computeF(L, keys[i - 1], O, T);
+        //L{n-1}=R{n}^f, O^=R
+        for (let j = 0; j < 4; ++j) {
+            O[j] ^= R[j];
+        }
+    }
+    L = buffers[0];
+    R = buffers[1];
+    if (!dest) {
+        dest = new Uint8Array(8);
+    } else {
+        dest.fill(0);
+    }
+    permutateByLR(dest, L, R, initPermInvArr);
+    return dest;
+
+}
+
+
+
+export { enc, dec };
