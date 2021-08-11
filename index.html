@@ -6,6 +6,115 @@
     <title>des</title>
 </head>
 <body>
+    <style>
+        .row{
+            display: flex;
+        }
+        .col{
+            flex: 0 0 auto;
+            margin-right: 20px;
+        }
+        fieldset>div {
+            padding: 5px 0px;
+        }
+        #wrapper{
+            display: inline-block;
+        }
+        textarea{
+            resize: none;
+        }
+        #encryptoBtn {
+            padding: 0.5em 1em;
+        }
+        fieldset{
+            margin-bottom: 1em;
+            border: 2px solid brown;
+        }
+        legend{
+            font-weight: 600;
+            color: brown;
+        }
+        input[type="text"] {
+            font-size: 20px;
+            width: 18em;
+        }
+    </style>
+    <div class="row">
+        <div id="wrapper" class="col">
+            <fieldset>
+                <legend>加密方式</legend>
+                <div id="cipherAlgDiv">
+                    加密演算法
+                    <label>
+                        <input type="radio" name="cipherAlg" value="des">
+                        DES
+                    </label>
+                    <label>
+                        <input type="radio" name="cipherAlg" value="3des" checked>
+                        3DES
+                    </label>
+                </div>
+                <div id="modeDiv">
+                    塊鏈結模式
+                    <label>
+                        <input type="radio" name="mode" value="ecb">
+                        ECB
+                    </label>
+                    <label>
+                        <input type="radio" name="mode" value="cbc" checked>
+                        CBC
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        填充 <select name="padding">
+                            <option value="PKCS#7">PKCS#7 (這裡同 PKCS#5)</option>
+                            <option value="Method-1">Method 1 (Zero padding)</option>
+                            <option value="Method-2">Method 2 </option>
+                        </select>
+                    </label>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>初始向量與金鑰</legend>
+                <div>
+                    <label>
+                        <input id="iv" type="text" placeholder="16 個 Hex 字元">
+                        初始向量
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input id="key" type="text" placeholder="32 或 48 個 Hex 字元">
+                        金鑰
+                    </label>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>原始訊息</legend>
+                <div>
+                    <label>
+                        <input type="radio" name="encoding" value="utf8" checked>
+                        Utf-8
+                    </label>
+                    <label>
+                        <input type="radio" name="encoding" value="hex">
+                        Hex
+                    </label>
+                </div>
+                <textarea id="plain" cols="60" rows="10"></textarea>
+                <div style="text-align: right;">
+                    <button id="encryptoBtn">加密</button>
+                </div>
+            </fieldset>
+        </div>
+        <div class="col">
+            <fieldset style="display: none;">
+                <legend>加密結果</legend>
+                <textarea id="output" cols="60" rows="10" readonly style="border: none;"></textarea>
+            </fieldset>
+        </div>
+    </div>
     <script src="main.js" type="module"></script>
 </body>
 </html>
