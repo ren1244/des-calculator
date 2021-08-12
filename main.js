@@ -1,11 +1,11 @@
-import { Coder } from './lib/coder.js';
-import { Padding } from './lib/padding.js';
-import * as Des from './lib/des.js';
-import * as TripleDes from './lib/triple-des.js';
-import { CBC } from './lib/cbc.js';
-import { ECB } from './lib/ecb.js';
-import { CFB } from './lib/cfb.js';
-import { OFB } from './lib/ofb.js';
+import { Coder } from './lib/encoding/coder.js';
+import { Padding } from './lib/padding/padding.js';
+import * as Des from './lib/cipher/des.js';
+import * as TripleDes from './lib/cipher/triple-des.js';
+import { CBC } from './lib/mode/cbc.js';
+import { ECB } from './lib/mode/ecb.js';
+import { CFB } from './lib/mode/cfb.js';
+import { OFB } from './lib/mode/ofb.js';
 
 const paddingMap = {
     "PKCS#7": Padding.Pkcs7,
