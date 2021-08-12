@@ -3,9 +3,6 @@ import * as Ciphers from './lib/cipher/ciphers.js';
 import * as Mode from './lib/mode/modes.js';
 import * as Padding from './lib/padding/paddings.js';
 
-
-window.cc=Coder;
-
 const paddingMap = {
     "PKCS#7": Padding.Pkcs7,
     "Method-1": Padding.Method1,
