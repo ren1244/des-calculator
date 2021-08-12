@@ -5,6 +5,7 @@ import * as TripleDes from './lib/triple-des.js';
 import { CBC } from './lib/cbc.js';
 import { ECB } from './lib/ecb.js';
 import { CFB } from './lib/cfb.js';
+import { OFB } from './lib/ofb.js';
 
 const paddingMap = {
     "PKCS#7": Padding.Pkcs7,
@@ -37,6 +38,14 @@ const modeMap = {
     },
     'cfb-64': {
         obj: CFB,
+        blockSize: 8,
+    },
+    'ofb-8': {
+        obj: OFB,
+        blockSize: 1,
+    },
+    'ofb-64': {
+        obj: OFB,
         blockSize: 8,
     }
 };
