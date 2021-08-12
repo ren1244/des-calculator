@@ -1,11 +1,8 @@
-import * as Coder from './lib/encoding/coder.js';
-import * as Padding from './lib/padding/padding.js';
-import * as Des from './lib/cipher/des.js';
-import * as TripleDes from './lib/cipher/triple-des.js';
-import { CBC } from './lib/mode/cbc.js';
-import { ECB } from './lib/mode/ecb.js';
-import { CFB } from './lib/mode/cfb.js';
-import { OFB } from './lib/mode/ofb.js';
+import * as Coder from './lib/encoding/encodings.js';
+import * as Ciphers from './lib/cipher/ciphers.js';
+import * as Mode from './lib/mode/modes.js';
+import * as Padding from './lib/padding/paddings.js';
+
 
 window.cc=Coder;
 
@@ -16,8 +13,8 @@ const paddingMap = {
 };
 
 const cipherMap = {
-    "des": Des,
-    "3des": TripleDes
+    "des": Ciphers.Des,
+    "3des": Ciphers.TripleDes
 };
 
 const encodingMap = {
@@ -27,27 +24,27 @@ const encodingMap = {
 
 const modeMap = {
     'cbc': {
-        obj: CBC,
+        obj: Mode.CBC,
         blockSize: 8,
     },
     'ecb': {
-        obj: ECB,
+        obj: Mode.ECB,
         blockSize: 8,
     },
     'cfb-8': {
-        obj: CFB,
+        obj: Mode.CFB,
         blockSize: 1,
     },
     'cfb-64': {
-        obj: CFB,
+        obj: Mode.CFB,
         blockSize: 8,
     },
     'ofb-8': {
-        obj: OFB,
+        obj: Mode.OFB,
         blockSize: 1,
     },
     'ofb-64': {
-        obj: OFB,
+        obj: Mode.OFB,
         blockSize: 8,
     }
 };
