@@ -64,6 +64,14 @@
                         <input type="radio" name="mode" value="cbc" checked>
                         CBC
                     </label>
+                    <label>
+                        <input type="radio" name="mode" value="cfb-8" checked>
+                        CFB-8
+                    </label>
+                    <label>
+                        <input type="radio" name="mode" value="cfb-64" checked>
+                        CFB-64
+                    </label>
                 </div>
                 <div>
                     <label>
@@ -113,9 +121,10 @@
                 <legend>加密結果</legend>
                 <textarea id="output" cols="60" rows="10" readonly style="border: none;"></textarea>
             </fieldset>
+            <p id="decResult"></p>
         </div>
     </div>
-    <!-- <script src="main.js" type="module"></script> -->
-    <script src="main.bundle.min.js"></script>
+    <script src="main.js" type="module"></script>
+    <!-- <script src="main.bundle.min.js"></script> -->
 </body>
 </html>
